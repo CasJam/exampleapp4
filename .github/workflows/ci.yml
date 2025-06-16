@@ -50,6 +50,9 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Bundle without development dependencies
+        run: bundle config set without 'development' && bundle install
+
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
