@@ -1,0 +1,30 @@
+<%= content_for(:title) do %>
+  <%= @post.title %>
+<% end %>
+
+<%= content_for(:breadcrumbs) do %>
+  <%= render "shared/components/breadcrumbs/breadcrumbs" do %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               text: "Posts",
+               link: posts_path %>
+    <%= render "shared/components/breadcrumbs/divider" %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               text: @post.title %>
+  <% end %>
+<% end %>
+
+<% content_for(:side_col) do %>
+  <%= render "posts/post_subnav",
+             active: "edit_post",
+             post: @post %>
+<% end %>
+
+<div class="space-y-12">
+  <%= render "shared/components/page_header",
+              title: @post.title %>
+
+  <div>
+    <%= t('scaffold.show_body', resource: 'post', field: 'title', default: 'This is the show view for the post, title.') %>
+  </div>
+
+</div>

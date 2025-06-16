@@ -1,0 +1,54 @@
+<%= content_for(:page_title) do %>
+  <%= t('kit.subscribe.title', default: 'Subscribe to our newsletter') %>
+<% end %>
+<%= content_for(:meta_description) do %>
+  <%= t('kit.subscribe.meta_description', default: 'Subscribe to our newsletter') %>
+<% end %>
+
+<% content_for(:require_cloudflare_turnstile_script, true) %>
+
+<div class="py-24 max-w-2xl mx-auto space-y-12">
+
+  <%= render "shared/components/page_header",
+              title: t('kit.subscribe.header', default: 'Subscribe to our newsletter') %>
+
+  <p class="xs:text-lg">
+    <%= t('kit.subscribe.description', default: 'Subscribe to our newsletter to get the latest updates.') %>
+  </p>
+
+  <%= form_with(url: kit_subscribe_path,
+                method: :post,
+                local: true,
+                class: "space-y-8",
+                data: { turbo: false }) do |f| %>
+
+    <%= hidden_field_tag :form_type, "newsletter" %>
+
+    <%= render "shared/components/forms/field",
+                form: f,
+                label: t('kit.form.email_label', default: 'Email'),
+                name: :email do %>
+      <%= f.email_field :email,
+                        placeholder: t('kit.form.email_placeholder', default: 'your@email.com'),
+                        required: true,
+                        autofocus: true,
+                        class: form_control_classes %>
+    <% end %>
+
+    <div class="space-y-4
+                sm:flex sm:items-center sm:justify-between sm:space-x-4 sm:space-y-0">
+      <div>
+        <%= button_tag type: "submit", class: "btn btn-primary btn-large" do %>
+          <span>
+            <%= t('kit.form.submit_button', default: 'Subscribe') %>
+          </span>
+        <% end %>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <%= cloudflare_turnstile %>
+      </div>
+    </div>
+  <% end %>
+
+</div>

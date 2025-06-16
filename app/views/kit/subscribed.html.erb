@@ -1,0 +1,21 @@
+<%= content_for(:page_title) do %>
+  <%= t('kit.subscribed.title', default: 'Thank you!') %>
+<% end %>
+<%= content_for(:meta_description) do %>
+  <%= t('kit.subscribed.meta_description', default: 'Thank you for subscribing!') %>
+<% end %>
+
+<div class="py-24 max-w-2xl mx-auto space-y-12">
+
+  <%= render "shared/components/page_header",
+              title: t('kit.subscribed.header', default: 'Thank you!') %>
+
+  <p class="xs:text-lg">
+    <% if @form_type == "newsletter" %>
+      <%= t('kit.subscribed.newsletter_description', default: 'Thank you for subscribing to our newsletter!') %>
+    <% else %>
+      <%= t('kit.subscribed.description', default: 'Thank you for subscribing!') %>
+    <% end %>
+  </p>
+
+</div>

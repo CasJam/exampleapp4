@@ -1,0 +1,24 @@
+<p>
+  <strong><%= t('contact_form.mailer.subject_label', default: 'Subject:') %></strong><br />
+  <%= @subject %>
+</p>
+
+<p>
+  <strong><%= t('contact_form.mailer.from_label', default: 'From:') %></strong><br />
+  <%= @name %>
+</p>
+
+<p>
+  <strong><%= t('contact_form.mailer.email_label', default: 'Email:') %></strong><br />
+  <%= @email %>
+</p>
+
+<p>
+  <strong><%= t('contact_form.mailer.message_label', default: 'Message:') %></strong><br />
+  <%= @message.html_safe %>
+</p>
+
+<p>
+  <strong><%= t('contact_form.mailer.page_url_label', default: 'Sent from page:') %></strong><br />
+  <%= @page_url %>
+</p>

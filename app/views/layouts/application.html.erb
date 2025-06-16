@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html class="h-screen">
+  <head>
+    <%= render "shared/head/head" %>
+    
+  </head>
+
+  <body class="instrumental-layout h-full group/sidebar"
+        data-controller="mobile-nav"
+        data-mobile-nav-open-value="false">
+    <%= turbo_frame_tag "flash_message" do %>
+      <%= render "shared/flash" %>
+    <% end %>
+
+    <%= render "layouts/global/mobile_nav" %>
+
+    <div class="h-screen lg:flex">
+      <%= render "layouts/application/sidebar" %>
+      <div class="flex-1 overflow-auto h-full">
+        <%= render "layouts/application/top" %>
+        <div class="pt-12 lg:pt-20">
+          <div class="px-6 py-12 mx-auto
+                      md:py-16 md:px-8 md:flex md:items-start md:space-x-12
+                      xl:space-x-24
+            <% if content_for?(:page_max_width) %>
+              <%= yield :page_max_width %>
+            <% else %>
+              <%= content_for?(:side_col) ? 'max-w-5xl' : 'max-w-4xl' %>
+            <% end %>">
+            <% if content_for?(:side_col) %>
+              <div class="pb-8 mb-8 border-b-2 border-gray-100 dark:border-gray-700
+                          md:w-1/4 md:border-0 md:mt-1">
+                <%= yield :side_col %>
+              </div>
+            <% end %>
+            <div class="flex-1">
+              <%= yield %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

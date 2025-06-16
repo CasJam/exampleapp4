@@ -1,0 +1,62 @@
+<%= turbo_stream.update "response" do %>
+  <% if @response[:success] %>
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100"><%= t('anthropic.response.claude_response_title', default: 'Claude Response') %></h2>
+        <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+          <span><%= t('anthropic.response.model_label', default: 'Model') %>: <%= @response[:model] %></span>
+          <span><%= t('anthropic.response.tokens_label', default: 'Tokens') %>: <%= @response[:usage]["input_tokens"] + @response[:usage]["output_tokens"] %></span>
+        </div>
+      </div>
+
+      <!-- Original Prompt -->
+      <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+        <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2"><%= t('anthropic.response.your_prompt_title', default: 'Your Prompt:') %></h3>
+        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-wrap"><%= @prompt %></p>
+      </div>
+
+      <!-- Claude Response -->
+      <div class="mb-6">
+        <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2"><%= t('anthropic.response.claude_response_title_section', default: "Claude's Response:") %></h3>
+        <div class="prose max-w-none">
+          <div class="bg-secondary-50 dark:bg-secondary-900 p-4 rounded-md border-l-4 border-secondary-500">
+            <p class="text-gray-800 dark:text-gray-100 whitespace-pre-wrap"><%= @response[:content] %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage Statistics -->
+      <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+        <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2"><%= t('anthropic.response.usage_details_title', default: 'Usage Details:') %></h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+          <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div class="font-medium text-gray-900 dark:text-gray-100"><%= t('anthropic.response.input_tokens', default: 'Input Tokens') %></div>
+            <div class="text-gray-600 dark:text-gray-300"><%= @response[:usage]["input_tokens"] %></div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div class="font-medium text-gray-900 dark:text-gray-100"><%= t('anthropic.response.output_tokens', default: 'Output Tokens') %></div>
+            <div class="text-gray-600 dark:text-gray-300"><%= @response[:usage]["output_tokens"] %></div>
+          </div>
+          <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div class="font-medium text-gray-900 dark:text-gray-100"><%= t('anthropic.response.stop_reason', default: 'Stop Reason') %></div>
+            <div class="text-gray-600 dark:text-gray-300"><%= @response[:finish_reason] %></div>
+          </div>
+        </div>
+      </div>
+
+      <% if @options.any? %>
+        <!-- Applied Options -->
+        <div class="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4">
+          <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2"><%= t('anthropic.response.applied_settings_title', default: 'Applied Settings:') %></h3>
+          <div class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <% @options.each do |key, value| %>
+              <div><span class="font-medium"><%= key.to_s.humanize %>:</span> <%= value %></div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render partial: "error" %>
+  <% end %>
+<% end %>

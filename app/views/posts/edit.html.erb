@@ -1,0 +1,33 @@
+<%= content_for(:title) do %>
+  Edit <%= @post.title %>
+<% end %>
+
+<%= content_for(:breadcrumbs) do %>
+  <%= render "shared/components/breadcrumbs/breadcrumbs" do %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               text: "Posts",
+               link: posts_path %>
+    <%= render "shared/components/breadcrumbs/divider" %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               link: post_path(@post),
+               text: @post.title %>
+    <%= render "shared/components/breadcrumbs/divider" %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               text: t('scaffold.edit', default: 'Edit') %>
+  <% end %>
+<% end %>
+
+<% content_for(:side_col) do %>
+  <%= render "posts/post_subnav",
+             active: "edit_post",
+             post: @post %>
+<% end %>
+
+<div class="space-y-12">
+
+  <%= render "shared/components/page_header",
+              title: t('scaffold.edit_title', resource: @resource_name, default: 'Edit %{resource}') %>
+
+  <%= render 'form',
+              post: @post %>
+</div>

@@ -1,0 +1,81 @@
+<%
+  container_padding = local_assigns[:container_padding] || "py-2 last:pb-0"
+  container_classes = local_assigns[:container_classes]
+  container_final_classes = "#{container_padding} #{container_classes}"
+
+  link_path = local_assigns[:link_path] || "#"
+  link_flex = local_assigns[:link_flex] || "sm:flex sm:items-center"
+  link_space_y = local_assigns[:link_space_y] || "space-y-2 sm:space-y-0"
+  link_space_x = local_assigns[:link_space_x] || "sm:space-x-4"
+  link_padding = local_assigns[:link_padding] || "py-3 px-4"
+  link_rounding = local_assigns[:link_rounding] || "rounded"
+  link_background_color = local_assigns[:link_background_color] ||
+        "bg-white dark:bg-gray-800
+        group-hover:bg-gray-100 dark:group-hover:bg-gray-700
+        focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none focus:ring-0"
+  link_classes = local_assigns[:link_classes] || "cursor-pointer"
+  link_final_classes = "#{link_flex} #{link_space_y} #{link_space_x} #{link_padding} #{link_rounding} #{link_background_color} #{link_classes}"
+
+  title = local_assigns[:title]
+  title_color = local_assigns[:title_color] ||
+        "text-primary
+        group-hover:text-black dark:group-hover:text-white
+        group-focus:text-black dark:group-focus:text-white"
+  title_text_size = local_assigns[:title_text_size] || "text-base lg:text-lg"
+  title_text_weight = local_assigns[:title_text_weight] || "font-medium"
+  title_classes = local_assigns[:title_classes]
+  title_final_classes = "#{title_text_size} #{title_text_weight} #{title_color} #{title_classes}"
+
+  description = local_assigns[:description]
+  description_text_size = local_assigns[:description_text_size] || "text-sm"
+  description_text_weight = local_assigns[:description_text_weight] || "font-normal"
+  description_color = local_assigns[:description_color] || "text-gray-400 dark:text-gray-500"
+  description_classes = local_assigns[:description_classes]
+  description_final_classes = "#{description_text_size} #{description_text_weight} #{description_color} #{description_classes}"
+
+  icon_content = local_assigns[:icon_content] # set something other than an icon, like an avatar
+  icon_name = local_assigns[:icon_name] # set this to display an icon
+  icon_stroke_width = local_assigns[:icon_stroke_width]
+  icon_size = local_assigns[:icon_size] || "w-12 h-12"
+  icon_color = local_assigns[:icon_color] ||
+      "text-gray-300 dark:text-gray-600
+      group-hover:text-gray-500 dark:group-hover:text-gray-400
+      group-focus:text-gray-500 dark:group-focus:text-gray-400"
+  icon_classes = local_assigns[:icon_classes]
+  icon_final_classes = "#{icon_size} #{icon_color} #{icon_classes}"
+
+  meta_content = local_assigns[:meta_content] # optionally show content on the right/end of the result (labels, etc.)
+%>
+
+<div class="<%= container_final_classes %>">
+  <%= link_to link_path,
+              class: "search-result block group #{link_final_classes}" do %>
+    <div class="flex-1 flex items-center space-x-6">
+      <% if icon_content.present? || icon_name.present? %>
+        <div class="size-10 flex flex-col items-center justify-center">
+          <% if icon_name.present? %>
+            <%= icon(icon_name, class: icon_final_classes, stroke_width: icon_stroke_width) %>
+          <% else %>
+            <%= icon_content %>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="flex-1 space-y-0.5">
+        <div class="<%= title_final_classes %>">
+          <%= title %>
+        </div>
+        <% if description.present? %>
+          <div class="<%= description_final_classes %>">
+            <%= description %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if meta_content.present? %>
+      <div class="flex items-center space-x-2">
+        <%= meta_content %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

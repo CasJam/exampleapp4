@@ -1,0 +1,43 @@
+<%= content_for(:title) do %>
+  Posts
+<% end %>
+
+<%= content_for(:breadcrumbs) do %>
+  <%= render "shared/components/breadcrumbs/breadcrumbs" do %>
+    <%= render "shared/components/breadcrumbs/breadcrumb_link",
+               text: "Posts" %>
+  <% end %>
+<% end %>
+
+<div class="space-y-12">
+
+  <% if @posts.any? %>
+    <%= render "shared/components/page_header",
+                title: "Posts",
+                button_link_path: new_post_path %>
+
+    <div class="space-y-6">
+
+      <%= render "shared/components/listings/listings" do %>
+        <% @posts.each do |post| %>
+          <%= render "posts/post_listing",
+                        post: post %>
+        <% end %>
+      <% end %>
+
+      <% if @pagy.pages > 1 %>
+        <div class="pagy-container">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+
+    </div>
+
+  <% else %>
+    <%= render "shared/components/listings/no_listings",
+                singular_object_name: "post",
+                plural_object_name: "posts",
+                new_path: new_post_path %>
+  <% end %>
+
+</div>

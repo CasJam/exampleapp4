@@ -1,0 +1,97 @@
+<%= content_for(:page_title) do %>
+  <%= t('contact_form.title', default: 'Contact us') %>
+<% end %>
+<%= content_for(:meta_description) do %>
+  <%= t('contact_form.meta_description', default: 'Get in touch!') %>
+<% end %>
+
+<% content_for(:require_cloudflare_turnstile_script, true) %>
+
+<div class="py-24 max-w-2xl mx-auto space-y-12">
+
+  <%= render "shared/components/page_header",
+              title: t('contact_form.header', default: 'Get in touch') %>
+
+  <p class="xs:text-lg">
+    <%= t('contact_form.description', default: 'Send any questions or inquiries to Brian Casel, the creator of Instrumental Components.') %>
+  </p>
+
+  <% if params[:sent].present? %>
+
+    <%= render "shared/components/callout",
+                icon_name: "send",
+                container_background: "bg-secondary-50 dark:bg-gray-900/50",
+                content_text_color: "text-secondary" do %>
+      <p>
+        <%= t('contact_form.success_message', default: 'Your message has been sent!') %>
+      </p>
+    <% end %>
+
+  <% else %>
+
+    <%= form_with(url: contact_form_submission_path,
+                  local: true,
+                  class: "space-y-8",
+                  data: { turbo: false }) do |f| %>
+      <%= render "shared/components/forms/field",
+                  form: f,
+                  label: t('contact_form.form.name_label', default: 'Name'),
+                  name: :name do %>
+        <%= f.text_field :name,
+                        placeholder: t('contact_form.form.name_placeholder', default: 'Your name'),
+                        class: form_control_classes,
+                        autofocus: true %>
+      <% end %>
+
+      <%= render "shared/components/forms/field",
+                  form: f,
+                  label: t('contact_form.form.email_label', default: 'Email'),
+                  name: :email do %>
+        <%= f.email_field :email,
+                        placeholder: t('contact_form.form.email_placeholder', default: 'your@email.com'),
+                        required: true,
+                        class: form_control_classes %>
+      <% end %>
+
+      <%= render "shared/components/forms/field",
+                  form: f,
+                  label: t('contact_form.form.subject_label', default: 'Subject'),
+                  name: :subject do %>
+        <%= f.text_field :subject,
+                        placeholder: t('contact_form.form.subject_placeholder', default: 'What is this regarding?'),
+                        class: form_control_classes %>
+      <% end %>
+
+      <%= render "shared/components/forms/field",
+                  form: f,
+                  label: t('contact_form.form.message_label', default: 'Message'),
+                  name: :message,
+                  rich_text_field: true do %>
+        <%= f.rich_text_area :message,
+                            placeholder: t('contact_form.form.message_placeholder', default: 'Your message...'),
+                            data: {
+                              controller: "components--rich-text",
+                              action: "focus->components--rich-text#focus blur->components--rich-text#unfocus"
+                            } %>
+      <% end %>
+
+      <div class="space-y-4
+                  sm:flex sm:items-center sm:justify-between sm:space-x-4 sm:space-y-0">
+        <div>
+          <%= button_tag type: "submit", class: "btn btn-primary btn-large" do %>
+            <span>
+              <%= t('contact_form.form.submit_button', default: 'Send') %>
+            </span>
+            <%= icon("send") %>
+          <% end %>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <%= cloudflare_turnstile %>
+        </div>
+      </div>
+    <% end %>
+
+  <% end %>
+
+</div>

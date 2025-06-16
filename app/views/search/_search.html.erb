@@ -1,0 +1,64 @@
+<%
+  id = local_assigns[:id] || "modal-#{SecureRandom.uuid}"
+  page_background_color = local_assigns[:page_background_color] || 'bg-black/70'
+  modal_width = local_assigns[:modal_width] || 'w-full lg:w-2/3 lg:max-w-4xl xl:w-3/5 2xl:w-1/2'
+  modal_background_color = local_assigns[:modal_background_color] || 'bg-white dark:bg-gray-800'
+  content_padding = local_assigns[:content_padding] || 'p-4'
+  search_input_placeholder = local_assigns[:search_input_placeholder] || t('search.input_placeholder', default: 'Search')
+
+  data = local_assigns[:data] || {}
+
+  default_data = {
+    "components--search-target": "searchModal",
+    action: "click->components--search#clickOutsideHide keydown->components--search#keyboardClose keydown->components--search#navigateResults"
+  }
+
+  # Merge default data with user-provided data
+  merged_data = default_data.merge(data) do |key, default_val, user_val|
+    "#{default_val} #{user_val}"
+  end
+
+  # Convert the merged data hash to HTML attributes
+  link_data_atts_html = merged_data.map { |k, v| "data-#{k}=\"#{v}\"" }.join(' ').html_safe
+%>
+
+<div class="search-modal hidden
+            z-50 fixed top-0 left-0 w-full h-full flex flex-col pt-8 px-8
+            lg:py-8 lg:items-center lg:justify-center
+            <%= page_background_color %>"
+     id="<%= id %>"
+     <%= link_data_atts_html %>>
+
+  <div class="search-modal-box
+              relative shadow-xl rounded-lg rounded-lg overflow-y-auto
+              md:mx-auto
+              <%= modal_background_color %>
+              <%= modal_width %>">
+    <div class="<%= content_padding %>">
+      <div>
+        <%= render "shared/components/forms/field",
+                    name: :query,
+                    no_label: true do %>
+          <%= text_field_tag :query,
+                            nil,
+                            {
+                              placeholder: search_input_placeholder,
+                              class: form_control_classes(
+                                additional_classes: "py-4 px-5 text-base sm:text-lg"
+                              ),
+                              autofocus: true,
+                              data: {
+                                "components--search-target": "input",
+                                action: "input->components--search#search"
+                              }
+                            } %>
+        <% end %>
+      </div>
+
+      <div class="hidden"
+           id="search-results"
+           data-components--search-target="results">
+      </div>
+    </div>
+  </div>
+</div>

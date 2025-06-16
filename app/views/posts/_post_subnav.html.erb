@@ -1,0 +1,16 @@
+<%= render "shared/components/subnav/subnav",
+             back_link_path: posts_path do %>
+
+  <%= render "shared/components/subnav/subnav_link",
+             link_path: edit_post_path(post),
+             link_text: t('scaffold.edit', resource: Post, default: 'Edit %{resource}'),
+             icon_name: "square-pen",
+             active: current_page?(edit_post_path(post)) %>
+
+  <%= render "shared/components/subnav/subnav_link",
+             link_path: post_path(post),
+             link_text: t('scaffold.view', resource: Post, default: 'View %{resource}'),
+             icon_name: "arrow-right",
+             active: current_page?(post_path(post)) %>
+
+<% end %>

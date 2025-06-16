@@ -1,0 +1,7 @@
+<%= render "shared/components/listings/listing",
+           listing_link: post_path(post),
+           title: post.title,
+           description: t('scaffold.created_ago', time: time_ago_in_words(post.created_at), default: 'Created %{time} ago') do %>
+  <%= render "post_settings",
+             post: post %>
+<% end %>

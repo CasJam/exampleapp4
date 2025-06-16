@@ -1,0 +1,14 @@
+<%= t('contact_form.mailer.subject_label', default: 'Subject:') %>
+<%= @subject %>
+
+<%= t('contact_form.mailer.from_label', default: 'From:') %>
+<%= @name %>
+
+<%= t('contact_form.mailer.email_label', default: 'Email:') %>
+<%= @email %>
+
+<%= t('contact_form.mailer.message_label', default: 'Message:') %>
+<%= strip_tags(@message) %>
+
+<%= t('contact_form.mailer.page_url_label', default: 'Sent from page:') %>
+<%= @page_url %>

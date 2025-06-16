@@ -1,0 +1,137 @@
+<% content_for :title, t('anthropic.title', default: 'Anthropic Claude Interface') %>
+
+<div class="space-y-8">
+  <h1 class="text-3xl font-bold"><%= t('anthropic.title', default: 'Anthropic Claude Interface') %></h1>
+
+  <%= form_with url: anthropic_prompt_index_path, method: :post, local: false,
+                data: { turbo_stream: true } do |form| %>
+
+    <div class="space-y-6">
+      <!-- Prompt Input -->
+      <%= render "shared/components/forms/field",
+                  form: form,
+                  label: t('anthropic.form.prompt_label', default: 'Your Instructions'),
+                  name: :prompt do %>
+        <%= form.text_area :prompt,
+                          required: true,
+                          placeholder: t('anthropic.form.prompt_placeholder', default: 'Enter your instructions or question here...'),
+                          class: form_control_classes,
+                          rows: 4 %>
+      <% end %>
+
+      <!-- System Instructions -->
+      <%= render "shared/components/forms/field",
+                  form: form,
+                  label: t('anthropic.form.system_instructions_label', default: 'System Instructions'),
+                  name: :system_instructions,
+                  tooltip: t('anthropic.form.system_instructions_tooltip', default: "System instructions define Claude's role, personality, and behavior. For example: 'You are a helpful coding assistant' or 'You are a creative writing coach who gives encouraging feedback.' This sets the context for how Claude should respond to your prompts.") do %>
+        <%= form.text_area :system_instructions,
+                          placeholder: t('anthropic.form.system_instructions_placeholder', default: 'You are a helpful assistant.'),
+                          class: form_control_classes,
+                          rows: 2 %>
+      <% end %>
+
+      <!-- Advanced Options Toggle -->
+      <div data-controller="components--toggle">
+        <button type="button"
+                data-action="click->components--toggle#toggle"
+                class="link flex items-center gap-2">
+          <span>
+            <%= icon("chevron-down", data: { "components--toggle-target": "toggleable" }) %>
+            <%= icon("chevron-up", data: { "components--toggle-target": "toggleable" }, class: "hidden") %>
+          </span>
+          <span>
+            <%= t('anthropic.form.advanced_options', default: 'Advanced Options') %>
+          </span>
+        </button>
+
+        <!-- Advanced Options -->
+        <div data-components--toggle-target="toggleable" class="hidden space-y-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Model Selection -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('anthropic.form.model_label', default: 'Model'),
+                        name: :model,
+                        select_field: true do %>
+              <%= form.select :model,
+                            options_for_select(@anthropic_service.available_models.map { |m| [m, m] }, "claude-3-haiku-20240307"),
+                            { include_blank: t('anthropic.form.model_default', default: 'Default (claude-3-haiku-20240307)') },
+                            { class: form_control_classes } %>
+            <% end %>
+
+            <!-- Max Tokens -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('anthropic.form.max_tokens_label', default: 'Max Tokens'),
+                        name: :max_tokens,
+                        tooltip: t('anthropic.form.max_tokens_tooltip', default: 'Tokens are pieces of words that Claude processes. One token is roughly 3-4 characters or about 0.75 words. This setting limits how long Claude\'s response can be. For example: 100 tokens = ~75 words, 500 tokens = ~375 words, 1000 tokens = ~750 words. Higher values allow longer responses but cost more.') do %>
+              <%= form.number_field :max_tokens,
+                                  placeholder: t('anthropic.form.max_tokens_placeholder', default: '1000'),
+                                  min: 1,
+                                  max: 8192,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Temperature -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('anthropic.form.temperature_label', default: 'Temperature'),
+                        name: :temperature,
+                        tooltip: t('anthropic.form.temperature_tooltip', default: 'Controls the creativity and randomness of Claude\'s responses. Lower values (0.0-0.3) make responses more focused and deterministic - good for factual questions or code. Higher values (0.7-1.0) make responses more creative and varied - good for brainstorming or creative writing. Claude works well with values between 0.0 and 1.0.') do %>
+              <%= form.number_field :temperature,
+                                  placeholder: t('anthropic.form.temperature_placeholder', default: '0.7'),
+                                  step: 0.1,
+                                  min: 0,
+                                  max: 1,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Top P -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('anthropic.form.top_p_label', default: 'Top P'),
+                        name: :top_p,
+                        tooltip: t('anthropic.form.top_p_tooltip', default: 'Also called \'nucleus sampling.\' Controls which words Claude considers when generating responses. Lower values (0.1-0.5) make Claude focus on the most likely words, creating more focused responses. Higher values (0.8-1.0) allow Claude to consider more word options, creating more diverse responses. Works together with temperature to control creativity.') do %>
+              <%= form.number_field :top_p,
+                                  placeholder: t('anthropic.form.top_p_placeholder', default: '1.0'),
+                                  step: 0.1,
+                                  min: 0,
+                                  max: 1,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Top K -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('anthropic.form.top_k_label', default: 'Top K'),
+                        name: :top_k,
+                        tooltip: t('anthropic.form.top_k_tooltip', default: 'Limits Claude to only consider the top K most likely next words at each step. Lower values (like 10-40) make responses more focused and consistent. Higher values (like 100+) allow more variety. This is an alternative to Top P - typically you\'d use one or the other, not both. Claude\'s default behavior works well without this parameter.') do %>
+              <%= form.number_field :top_k,
+                                  placeholder: t('anthropic.form.top_k_placeholder', default: 'Leave empty for default'),
+                                  min: 1,
+                                  max: 500,
+                                  class: form_control_classes %>
+            <% end %>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <%= form.submit t('anthropic.form.submit_button', default: 'Generate Response'),
+                       class: "btn btn-primary",
+                       data: { disable_with: t('anthropic.form.submit_button_loading', default: 'Generating...') } %>
+      </div>
+    </div>
+
+  <% end %>
+
+  <!-- Response Area -->
+  <div id="response">
+    <!-- Response will be inserted here via Turbo Stream -->
+  </div>
+
+</div>

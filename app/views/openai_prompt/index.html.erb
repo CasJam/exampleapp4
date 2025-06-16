@@ -1,0 +1,152 @@
+<% content_for :title, t('openai.title', default: 'OpenAI Chat Interface') %>
+
+<div class="space-y-8">
+  <h1 class="text-3xl font-bold"><%= t('openai.title', default: 'OpenAI Chat Interface') %></h1>
+
+  <%= form_with url: openai_prompt_index_path, method: :post, local: false,
+                data: { turbo_stream: true } do |form| %>
+
+    <div class="space-y-6">
+      <!-- Prompt Input -->
+      <%= render "shared/components/forms/field",
+                  form: form,
+                  label: t('openai.form.prompt_label', default: 'Your Instructions'),
+                  name: :prompt do %>
+        <%= form.text_area :prompt,
+                          required: true,
+                          placeholder: t('openai.form.prompt_placeholder', default: 'Enter your instructions or question here...'),
+                          class: form_control_classes,
+                          rows: 4 %>
+      <% end %>
+
+      <!-- System Instructions -->
+      <%= render "shared/components/forms/field",
+                  form: form,
+                  label: t('openai.form.system_instructions_label', default: 'System Instructions'),
+                  name: :system_instructions,
+                  tooltip: t('openai.form.system_instructions_tooltip', default: "System instructions define the AI's role, personality, and behavior. For example: 'You are a helpful coding assistant' or 'You are a creative writing coach who gives encouraging feedback.' This sets the context for how the AI should respond to your prompts.") do %>
+        <%= form.text_area :system_instructions,
+                          placeholder: t('openai.form.system_instructions_placeholder', default: 'You are a helpful assistant.'),
+                          class: form_control_classes,
+                          rows: 2 %>
+      <% end %>
+
+      <!-- Advanced Options Toggle -->
+      <div data-controller="components--toggle">
+        <button type="button"
+                data-action="click->components--toggle#toggle"
+                class="link flex items-center gap-2">
+          <span>
+            <%= icon("chevron-down", data: { "components--toggle-target": "toggleable" }) %>
+            <%= icon("chevron-up", data: { "components--toggle-target": "toggleable" }, class: "hidden") %>
+          </span>
+          <span>
+            <%= t('openai.form.advanced_options', default: 'Advanced Options') %>
+          </span>
+        </button>
+
+        <!-- Advanced Options -->
+        <div data-components--toggle-target="toggleable" class="hidden space-y-6 mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Model Selection -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.model_label', default: 'Model'),
+                        name: :model,
+                        select_field: true do %>
+              <%= form.select :model,
+                            options_for_select(@openai_service.available_models.map { |m| [m, m] }, "gpt-4o-mini"),
+                            { include_blank: t('openai.form.model_default', default: 'Default (gpt-4o-mini)') },
+                            { class: form_control_classes } %>
+            <% end %>
+
+            <!-- Max Tokens -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.max_tokens_label', default: 'Max Tokens'),
+                        name: :max_tokens,
+                        tooltip: t('openai.form.max_tokens_tooltip', default: 'Tokens are pieces of words that the AI processes. One token is roughly 3-4 characters or about 0.75 words. This setting limits how long the AI\'s response can be. For example: 100 tokens = ~75 words, 500 tokens = ~375 words, 1000 tokens = ~750 words. Higher values allow longer responses but cost more.') do %>
+              <%= form.number_field :max_tokens,
+                                  placeholder: t('openai.form.max_tokens_placeholder', default: '1000'),
+                                  min: 1,
+                                  max: 4000,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Temperature -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.temperature_label', default: 'Temperature'),
+                        name: :temperature,
+                        tooltip: t('openai.form.temperature_tooltip', default: 'Controls the creativity and randomness of the AI\'s responses. Lower values (0.0-0.3) make responses more focused and deterministic - good for factual questions or code. Higher values (0.7-1.0) make responses more creative and varied - good for brainstorming or creative writing. Values above 1.0 can produce very unpredictable results.') do %>
+              <%= form.number_field :temperature,
+                                  placeholder: t('openai.form.temperature_placeholder', default: '0.7'),
+                                  step: 0.1,
+                                  min: 0,
+                                  max: 2,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Top P -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.top_p_label', default: 'Top P'),
+                        name: :top_p,
+                        tooltip: t('openai.form.top_p_tooltip', default: 'Also called \'nucleus sampling.\' Controls which words the AI considers when generating responses. Lower values (0.1-0.5) make the AI focus on the most likely words, creating more focused responses. Higher values (0.8-1.0) allow the AI to consider more word options, creating more diverse responses. Works together with temperature to control creativity.') do %>
+              <%= form.number_field :top_p,
+                                  placeholder: t('openai.form.top_p_placeholder', default: '1.0'),
+                                  step: 0.1,
+                                  min: 0,
+                                  max: 1,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Frequency Penalty -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.frequency_penalty_label', default: 'Frequency Penalty'),
+                        name: :frequency_penalty,
+                        tooltip: t('openai.form.frequency_penalty_tooltip', default: 'Reduces the likelihood of the AI repeating the same words or phrases. Positive values (0.1-1.0) discourage repetition - useful for avoiding redundant text. Negative values (-0.1 to -1.0) encourage repetition - might be useful for emphasis or patterns. Zero means no penalty. Higher absolute values have stronger effects.') do %>
+              <%= form.number_field :frequency_penalty,
+                                  placeholder: t('openai.form.frequency_penalty_placeholder', default: '0.0'),
+                                  step: 0.1,
+                                  min: -2,
+                                  max: 2,
+                                  class: form_control_classes %>
+            <% end %>
+
+            <!-- Presence Penalty -->
+            <%= render "shared/components/forms/field",
+                        form: form,
+                        label: t('openai.form.presence_penalty_label', default: 'Presence Penalty'),
+                        name: :presence_penalty,
+                        tooltip: t('openai.form.presence_penalty_tooltip', default: 'Encourages the AI to introduce new topics and concepts rather than staying on the same subject. Positive values (0.1-1.0) push the AI to explore new ideas and avoid dwelling on topics already mentioned. Negative values encourage the AI to stay focused on current topics. Use positive values for brainstorming or exploring diverse ideas.') do %>
+              <%= form.number_field :presence_penalty,
+                                  placeholder: t('openai.form.presence_penalty_placeholder', default: '0.0'),
+                                  step: 0.1,
+                                  min: -2,
+                                  max: 2,
+                                  class: form_control_classes %>
+            <% end %>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <%= form.submit t('openai.form.submit_button', default: 'Generate Response'),
+                       class: "btn btn-primary",
+                       data: { disable_with: t('openai.form.submit_button_loading', default: 'Generating...') } %>
+      </div>
+    </div>
+
+  <% end %>
+
+  <!-- Response Area -->
+  <div id="response">
+    <!-- Response will be inserted here via Turbo Stream -->
+  </div>
+
+</div>

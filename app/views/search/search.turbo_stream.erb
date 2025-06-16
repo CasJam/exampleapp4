@@ -1,0 +1,16 @@
+<%= turbo_stream.update "search-results" do %>
+  <% if @results.any? %>
+    <div class="divide-y divide-gray-200 dark:divide-gray-600">
+      <% @results.each do |result| %>
+        <%= render "search/search_result",
+                    title: result.title,
+                    description: nil,
+                    link_path: post_path(result) %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-gray-500 dark:text-gray-400 text-center py-12 font-medium">
+      <%= t('search.no_results', default: 'No results') %>
+    </div>
+  <% end %>
+<% end %>

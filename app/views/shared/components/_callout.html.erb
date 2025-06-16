@@ -1,0 +1,154 @@
+<%
+  # Link
+  link_container = local_assigns.fetch(:link_container, false) # set to true to make the entire callout a link
+  link_path = local_assigns[:link_path]
+  link_target = local_assigns[:link_target] || "_self"
+  link_method = local_assigns[:link_method] || "get"
+  button_link = local_assigns.fetch(:button_link, false) # set to true to make the link element a button instead of a link
+
+  # Container
+  container_flex = local_assigns[:container_flex] || "flex-1"
+  container_background = local_assigns[:container_background] || "bg-gray-100/80 dark:bg-gray-900"
+  container_rounded = local_assigns[:container_rounded] || "rounded-lg"
+  container_border = local_assigns[:container_border]
+  container_padding = local_assigns[:container_padding] || "p-4 sm:p-6 lg:p-8 2xl:p-10"
+  container_margin = local_assigns[:container_margin]
+  container_space_y = local_assigns[:container_space_y] || "space-y-4 lg:space-y-6 2xl:space-y-8"
+  container_shadow = local_assigns[:container_shadow]
+  container_classes = local_assigns[:container_classes]
+  container_final_classes = "#{container_flex} #{container_background} #{container_rounded} #{container_border} #{container_padding} #{container_margin} #{container_space_y} #{container_shadow} #{container_classes}"
+
+  # Headline
+  custom_headline_content = local_assigns[:custom_headline_content] # Set this to replace the headline element with your own
+  headline_text = local_assigns[:headline_text]
+  headline_text_size = local_assigns[:headline_text_size] || "text-xl sm:text-2xl 2xl:text-3xl"
+  headline_text_color = local_assigns[:headline_text_color] || "text-black dark:text-white"
+  headline_font_weight = local_assigns[:headline_font_weight] || "font-semibold"
+  headline_text_alignment = local_assigns[:headline_text_alignment] || "text-left"
+  headline_tracking = local_assigns[:headline_tracking] || "tracking-tight"
+  headline_classes = local_assigns[:headline_classes]
+  headline_final_classes = "text-pretty #{headline_text_size} #{headline_text_color} #{headline_font_weight} #{headline_text_alignment} #{headline_tracking} #{headline_classes}"
+
+  # Content
+  content_text_size = local_assigns[:content_text_size] || "lg:text-lg"
+  content_text_color = local_assigns[:content_text_color] || (link_container ? "text-gray-600 dark:text-gray-400" : nil)
+  content_font_weight = local_assigns[:content_font_weight] || "font-medium"
+  content_space_y = local_assigns[:content_space_y] || "space-y-4 lg:space-y-6"
+  content_classes = local_assigns[:content_classes]
+  content_final_classes = "text-pretty #{content_text_size} #{content_text_color} #{content_font_weight} #{content_space_y} #{content_classes}"
+
+  # Icon
+  icon_name = local_assigns[:icon_name]
+  icon_size = local_assigns[:icon_size] || (headline_text.present? ? "w-6 h-6 lg:w-8 lg:h-8" : "w-5 h-5 lg:w-6 lg:h-6")
+  icon_color = local_assigns[:icon_color] || "text-secondary"
+  icon_stroke_width = local_assigns[:icon_stroke_width] || 2
+  icon_classes = local_assigns[:icon_classes]
+  icon_final_classes = "#{icon_size} #{icon_color} #{icon_classes}"
+  icon_container_height = local_assigns[:icon_container_height] || (headline_text.present? ? "h-[1.6rem] md:h-[1.7rem] lg:h-[2rem]" : "h-[1.4rem] md:h-[1.5rem] lg:h-[1.7rem]")
+  with_icon_container_flex = local_assigns[:with_icon_container_flex] || "flex items-start space-x-4 lg:space-x-6"
+  with_icon_content_container_space_y = local_assigns[:with_icon_content_container_space_y] || "space-y-4 lg:space-y-6"
+  with_icon_content_container_classes = local_assigns[:with_icon_content_container_classes]
+  with_icon_content_container_final_classes = "#{with_icon_content_container_space_y} #{with_icon_content_container_classes}"
+
+  # Button
+  button_text = local_assigns[:button_text]
+  button_classes = local_assigns[:button_classes] || "btn btn-primary"
+  button_size = local_assigns[:button_size] || "xl:btn-large"
+  button_icon = local_assigns[:button_icon]
+  button_icon_size = local_assigns[:button_icon_size] || 20
+  button_text_color = local_assigns[:button_text_color]
+  button_text_size = local_assigns[:button_text_size] || "2xl:text-xl"
+  button_background_color = local_assigns[:button_background_color]
+  button_icon_position = local_assigns[:button_icon_position] || "before"
+  button_final_classes = "group #{button_classes} #{button_size} #{button_text_size} #{button_background_color}"
+%>
+
+<% button_content = capture do %>
+  <% if button_icon.present? && button_icon_position == "before" %>
+    <%= icon(button_icon, size: button_icon_size) %>
+  <% end %>
+  <span class="<%= button_text_color %>">
+    <%= button_text %>
+  </span>
+  <% if button_icon.present? && button_icon_position == "after" %>
+    <%= icon(button_icon, size: button_icon_size) %>
+  <% end %>
+<% end %>
+
+<% content = capture do %>
+  <% if custom_headline_content.present? %>
+    <%= custom_headline_content %>
+  <% elsif headline_text.present? %>
+    <h3 class="<%= headline_final_classes %>">
+      <%= headline_text %>
+    </h3>
+  <% end %>
+
+  <div class="<%= content_final_classes %>">
+    <%= yield %>
+  </div>
+
+  <% if button_text.present? %>
+    <div class="pt-2">
+      <% if link_container %>
+        <div class="<%= button_final_classes %>">
+          <%= button_content %>
+        </div>
+      <% else %>
+        <% if button_link %>
+          <%= button_to link_path,
+                        class: button_final_classes,
+                        target: link_target,
+                        method: link_method do %>
+            <%= button_content %>
+          <% end %>
+        <% else %>
+          <%= link_to link_path,
+                      class: button_final_classes,
+                      target: link_target,
+                      method: link_method do %>
+            <%= button_content %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% final_content = capture do %>
+  <% if icon_name.present? %>
+    <div class="<%= with_icon_container_flex %>">
+      <div class="flex flex-col items-center justify-center
+                  <%= icon_container_height %>">
+        <%= icon(icon_name, class: icon_final_classes, stroke_width: icon_stroke_width) %>
+      </div>
+      <div class="<%= with_icon_content_container_final_classes %>">
+        <%= content %>
+      </div>
+    </div>
+  <% else %>
+    <%= content %>
+  <% end %>
+<% end %>
+
+<% if link_container %>
+  <% if button_link %>
+    <%= link_to link_path,
+                class: "group block #{container_final_classes}",
+                target: link_target,
+                method: link_method do %>
+      <%= content %>
+    <% end %>
+  <% else %>
+    <%= link_to link_path,
+                class: "group block #{container_final_classes}",
+                target: link_target,
+                method: link_method do %>
+      <%= final_content %>
+    <% end %>
+  <% end %>
+<% else %>
+  <div class="<%= container_final_classes %>">
+    <%= final_content %>
+  </div>
+<% end %>

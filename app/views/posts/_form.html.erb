@@ -1,0 +1,37 @@
+<%= form_with(model: @post,
+               url: @post.new_record? ? posts_path : post_path(@post),
+               local: true) do |f| %>
+  <%= render 'shared/components/forms/errors', model: @post %>
+
+  <div class="space-y-8">
+
+    <%= render "shared/components/forms/field",
+                 form: f,
+                 label: "Title",
+                 name: :title do %>
+      <%= f.text_field :title,
+                        placeholder: "Title",
+                        class: form_control_classes,
+                        autofocus: true %>
+    <% end %>
+
+    
+    <% unless @post.new_record? %>
+      
+      <%= render "shared/components/forms/field",
+                  form: f,
+                  label: "Slug",
+                  name: :slug do %>
+        <%= f.text_field :slug,
+                placeholder: "Slug",
+                class: form_control_classes%>
+      <% end %>
+      
+    <% end %>
+    
+    <div>
+      <%= f.submit class: "btn btn-primary" %>
+    </div>
+
+  </div>
+<% end %>
